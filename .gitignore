@@ -1,0 +1,4 @@
+Task1/**/.terraform*
+Task1/.env*
+Task1/**/*.tfstate*
+Task1/terraform_states
