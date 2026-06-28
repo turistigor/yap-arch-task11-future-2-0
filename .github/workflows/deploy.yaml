@@ -1,0 +1,30 @@
+name: Deployment by Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        required: true
+        description: "Выберите окружение"
+        options:
+          - dev
+          - stage
+          - prod
+
+env:
+  TEST_SECRET: ${{ secrets.TEST_SECRET }}
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo envs 
+        run: |
+          echo "Выбранное окружение: ${{ github.event.inputs.environment }}"
+          
+          if [ "$TEST_SECRET" = "TEST_SECRET_VALUE_!" ]; then
+            echo "Успех: Секрет соответствует ожидаемому значению."
+          else
+            echo "Ошибка: Значение секрета неверно."
+          fi
