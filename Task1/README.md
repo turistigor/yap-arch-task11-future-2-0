@@ -46,13 +46,10 @@ cd <env_dir: dev/prod/stage>
 export YC_TOKEN="<access_token>"
 
 terraform init
-terraform plan -state="../../terraform_states/terraform.tfstate" -var-file=values.tfvars
-terraform apply -auto-approve -state="../../terraform_states/terraform.tfstate" -var-file=values.tfvars
+terraform plan -var-file=values.tfvars -state="../../terraform_states/terraform.tfstate"
+terraform apply -auto-approve -var-file=values.tfvars -path="../../terraform_states/terraform.tfstate"
 ```
 - при необходимости удалить модуль из YC:
 ```bash
-terraform destroy -auto-approve -state="../../terraform_states/terraform.tfstate" -var-file=values.tfvars
+terraform destroy -auto-approve -var-file=values.tfvars -path="../../terraform_states/terraform.tfstate"
 ```
-
-
-
