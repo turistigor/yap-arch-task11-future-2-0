@@ -47,9 +47,17 @@ export YC_TOKEN="<access_token>"
 
 terraform init
 terraform plan -var-file=values.tfvars -state="../../terraform_states/terraform.tfstate"
-terraform apply -auto-approve -var-file=values.tfvars -path="../../terraform_states/terraform.tfstate"
+terraform apply -auto-approve -var-file=values.tfvars -state="../../terraform_states/terraform.tfstate"
 ```
 - при необходимости удалить модуль из YC:
 ```bash
-terraform destroy -auto-approve -var-file=values.tfvars -path="../../terraform_states/terraform.tfstate"
+terraform destroy -auto-approve -var-file=values.tfvars -state="../../terraform_states/terraform.tfstate"
 ```
+
+Результаты:
+
+![](./pictures/cloud-compute.png)
+
+![](./pictures/vm.png)
+
+![](./pictures/disk.png)

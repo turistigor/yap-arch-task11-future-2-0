@@ -17,3 +17,12 @@ Workflow состоит из двух стадий "plan" и "apply". Перва
 
 Безопасность обеспечивается зас счет передачи секретов через envs, безопасная доставка  которых обеспечивается механизмами CI/CD-системы.
 
+## Результаты
+
+![](./pictures/run-pipeline.png)
+
+![](./pictures/successful-pipeline.png)
+
+![](./pictures/yc-dashboard.png)
+
+![](./pictures/yc-bucket.png)
