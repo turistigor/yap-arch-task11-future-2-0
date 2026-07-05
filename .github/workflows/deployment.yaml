@@ -2,29 +2,75 @@ name: Deployment by Terraform
 
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        type: choice
-        required: true
-        description: "Выберите окружение"
-        options:
-          - dev
-          - stage
-          - prod
 
 env:
-  TEST_SECRET: ${{ secrets.TEST_SECRET }}
+  TF_WORKING_DIR: ./Task2/vm_module
+  TF_VAR_yc_token: ${{ secrets.YC_TOKEN }}
+  TF_VAR_cloud_id: ${{ secrets.YC_CLOUD_ID }}
+  TF_VAR_folder_id: ${{ secrets.YC_FOLDER_ID }}
+  TF_VAR_subnet_id: ${{ secrets.YC_SUBNET_ID }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
-  test-job:
+  plan:
+    name: "Terraform Plan"
     runs-on: ubuntu-latest
+
     steps:
-      - name: Echo envs 
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          echo "Выбранное окружение: ${{ github.event.inputs.environment }}"
-          
-          if [ "$TEST_SECRET" = "TEST_SECRET_VALUE_!" ]; then
-            echo "Успех: Секрет соответствует ожидаемому значению."
-          else
-            echo "Ошибка: Значение секрета неверно."
-          fi
+          terraform plan \
+            -var-file=values.tfvars \
+            -out=tfplan
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_WORKING_DIR }}/tfplan
+
+  apply:
+    name: "Terraform Apply"
+    runs-on: ubuntu-latest
+    needs: plan
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve tfplan
